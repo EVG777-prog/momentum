@@ -144,8 +144,6 @@ cityWeather.addEventListener('change', (el) => {
     const reg = /^[a-zA-Zа-яА-Я -]+$/;
 
     if (el.target.value && reg.test(el.target.value)) {
-        console.log('Correct city!!!')
-        console.log(document.querySelector('.tip').classList);
         document.querySelector('.tip').classList.remove('active');
         localStorage.setItem('city', el.target.value);
         getWeather(el.target.value);
@@ -235,7 +233,7 @@ function nextAudio() {
     numAudio = numAudio == playList.length - 1 ? 0 : numAudio + 1;
     audio.src = playList[numAudio].src;
     clearAudioMarks();
-    document.querySelector(`.play-item[data-src="${playList[numAudio].src}"]`).classList.add('item-active');
+    // document.querySelector(`.play-item[data-src="${playList[numAudio].src}"]`).classList.add('item-active');
     isPlay = false;
     playAudio();
 }
@@ -245,7 +243,7 @@ function prevAudio() {
     numAudio = numAudio == 0 ? playList.length - 1 : numAudio - 1;
     audio.src = playList[numAudio].src;
     clearAudioMarks();
-    document.querySelector(`.play-item[data-src="${playList[numAudio].src}"]`).classList.add('item-active');
+    // document.querySelector(`.play-item[data-src="${playList[numAudio].src}"]`).classList.add('item-active');
     isPlay = false;
     playAudio();
 }
@@ -254,9 +252,12 @@ function playAudio() {
     showNameSong();
 
     if (!isPlay) {
+        document.querySelector(`.play-item[data-src="${playList[numAudio].src}"]`).classList.add('item-active');
         audio.play();
         play.classList.add('pause');
         isPlay = true;
+        console.log(numAudio);
+        // playListT.querySelector(`li[data-src="${audio.src}"`));
         showProgressAudio = setInterval(showProgress, 100);
     } else {
         audio.pause();
