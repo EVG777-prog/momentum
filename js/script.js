@@ -1,7 +1,7 @@
 import playList from './playList.js';
 
 // translate
-let srcPhotoBack = 'flickr';
+let srcPhotoBack;
 let langSite = 'ru';
 let bgNum = getRandomNum();
 
@@ -13,7 +13,7 @@ const lang = {
     },
     en: {
         dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        timeDay: ['Good Night', 'Good Morning', 'Good Day', 'Good Evening'],
+        timeDay: ['Good night', 'Good morning', 'Good afternoon', 'Good evening'],
         quotes: 'dataQuotesEN.json',
     },
 };
@@ -104,7 +104,7 @@ function getRandomNum() {
 function setBg2(image) {
     const img = new Image();
     img.src = image;
-    console.log(img.src);
+    // console.log(img.src);
 
     img.addEventListener('load', () => {
         body.style.background = `url(${img.src}) center/cover, rgba(0, 0, 0, 0.5)`;
@@ -114,17 +114,14 @@ function setBg2(image) {
 
 function setBg() {
     switch (srcPhotoBack) {
-        case 'github':
-            let srcPhoto = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${getTimeOfDay().toLowerCase()}/${String(bgNum).padStart(2, '0')}.jpg`;
-            console.log('Get photos from Github');
+        case 'GitHub':
+            let srcPhoto = `https://raw.githubusercontent.com/EVG777-prog/stage1-tasks/assets/images/${getTimeOfDay().toLowerCase()}/${String(bgNum).padStart(2, '0')}.jpg`;
             setBg2(srcPhoto);
             break;
-        case 'unsplash':
-            console.log('Get photos from Unsplash');
+        case 'Unsplash':
             getPhotosUnsplash();
             break;
-        case 'flickr':
-            console.log('Get photos from Flickr');
+        case 'Flickr':
             getPhotosFlickr();
             break;
     }
@@ -164,9 +161,9 @@ async function getWeather(city = 'Минск') {
 
     weatherIcon.className = 'weather-icon owf';
     weatherIcon.classList.add(`owf-${data.weather[0].id}`);
-    temperature.textContent = `${data.main.temp}°C`;
-    wind.textContent = `${langSite == 'en' ? 'Wind speed' : 'Скорость ветра'}: ${data.wind.speed} m/s`;
-    humidity.textContent = `${langSite == 'en' ? 'Humidity' : 'Влажность'}: ${data.main.humidity}%`;
+    temperature.textContent = `${Math.round(data.main.temp)}°C`;
+    wind.textContent = `${langSite == 'en' ? 'Wind speed' : 'Скорость ветра'}: ${Math.round(data.wind.speed)} m/s`;
+    humidity.textContent = `${langSite == 'en' ? 'Humidity' : 'Влажность'}: ${Math.round(data.main.humidity)}%`;
     weatherDescription.textContent = data.weather[0].description;
 }
 
@@ -344,85 +341,99 @@ const cbxTime = document.querySelector('#cbx-time');
 const cbxData = document.querySelector('#cbx-data');
 const cbxQuotes = document.querySelector('#cbx-quotes');
 const langChange = document.querySelector('#lang-change');
+const settingParts = document.querySelectorAll('.cont-setting input');
+const srcPictures = document.querySelector('#src-pict');
 
-cbxWeather.addEventListener('change', (el) => {
-    console.log(el.target.checked);
-    if (el.target.checked) {
-        document.querySelector('.weather').style.visibility = 'visible';
-    } else {
-        document.querySelector('.weather').style.visibility = 'hidden';
-    }
+srcPictures.addEventListener('change', (el) => {
+    srcPhotoBack = el.target.value;
+    localStorage.setItem('srcPhotoBack', srcPhotoBack);
+    setBg();
 });
-cbxAudio.addEventListener('change', (el) => {
-    console.log(el.target.checked);
-    if (el.target.checked) {
+
+const visibleParts = {
+    weather: true,
+    audio: true,
+    welcome: true,
+    time: true,
+    data: true,
+    quotes: true
+}
+
+settingParts.forEach((el) => {
+    el.addEventListener('change', showParts);
+});
+
+function showParts() {
+    document.querySelector('.weather').style.visibility = document.querySelector('#cbx-weather').checked ? 'visible' : 'hidden';
+    if (document.querySelector('#cbx-audio').checked) {
         document.querySelector('.player-full').style.visibility = 'visible';
         document.querySelector('.player').style.visibility = 'visible';
     } else {
         document.querySelector('.player-full').style.visibility = 'hidden';
         document.querySelector('.player').style.visibility = 'hidden';
     }
-});
-cbxWelcome.addEventListener('change', (el) => {
-    console.log(el.target.checked);
-    if (el.target.checked) {
-        document.querySelector('.greeting-container').style.visibility = 'visible';
-    } else {
-        document.querySelector('.greeting-container').style.visibility = 'hidden';
-    }
-});
-cbxTime.addEventListener('change', (el) => {
-    console.log(el.target.checked);
-    if (el.target.checked) {
-        document.querySelector('.time').style.visibility = 'visible';
-    } else {
-        document.querySelector('.time').style.visibility = 'hidden';
-    }
-});
-cbxData.addEventListener('change', (el) => {
-    console.log(el.target.checked);
-    if (el.target.checked) {
-        document.querySelector('.date').style.visibility = 'visible';
-    } else {
-        document.querySelector('.date').style.visibility = 'hidden';
-    }
-});
-cbxQuotes.addEventListener('change', (el) => {
-    console.log(el.target.checked);
-    if (el.target.checked) {
+    document.querySelector('.greeting-container').style.visibility = document.querySelector('#cbx-welcome').checked ? 'visible' : 'hidden';
+    document.querySelector('.time').style.visibility = document.querySelector('#cbx-time').checked ? 'visible' : 'hidden';
+    document.querySelector('.date').style.visibility = document.querySelector('#cbx-date').checked ? 'visible' : 'hidden';
+    if (document.querySelector('#cbx-quotes').checked) {
         document.querySelector('.change-quote').style.visibility = 'visible';
         document.querySelector('#quotes').style.visibility = 'visible';
     } else {
         document.querySelector('.change-quote').style.visibility = 'hidden';
         document.querySelector('#quotes').style.visibility = 'hidden';
     }
-});
+    saveShowParts();
+}
+
+function saveShowParts() {
+    localStorage.setItem('show_weather', settingParts[0].checked);
+    localStorage.setItem('show_audio', settingParts[1].checked);
+    localStorage.setItem('show_welcome', settingParts[2].checked);
+    localStorage.setItem('show_time', settingParts[3].checked);
+    localStorage.setItem('show_date', settingParts[4].checked);
+    localStorage.setItem('show_quotes', settingParts[5].checked);
+}
+
+function readShowParts() {
+    settingParts[0].checked = localStorage.getItem('show_weather') == 'false' ? false : true;
+    settingParts[1].checked = localStorage.getItem('show_audio') == 'false' ? false : true;
+    settingParts[2].checked = localStorage.getItem('show_welcome') == 'false' ? false : true;
+    settingParts[3].checked = localStorage.getItem('show_time') == 'false' ? false : true;
+    settingParts[4].checked = localStorage.getItem('show_date') == 'false' ? false : true;
+    settingParts[5].checked = localStorage.getItem('show_quotes') == 'false' ? false : true;
+}
+
 langChange.addEventListener('change', (el) => {
-    console.log(el.target.value);
+
     langSite = el.target.value.toLowerCase();
+    localStorage.setItem('langSite', langSite);
     changeLang();
     translateMenu();
 });
 
-
-
-
-
 // start
+
+const contSetting = document.querySelectorAll('.cont-setting p');
 
 start();
 
 function start() {
+    langSite = localStorage.getItem('langSite') || 'en';
+    langChange.value = langSite == 'en' ? 'EN' : 'RU';
+    srcPhotoBack = localStorage.getItem('srcPhotoBack') || 'GitHub';
+    srcPictures.value = srcPhotoBack;
+    cityWeather.value = langSite == 'en' ? 'Minsk' : 'Минск';
     getQuotes();
     getWeather(cityWeather.value);
     setBg();
     showTime();
     document.querySelector('.play-item').classList.add('item-active');
+    readShowParts();
+    showParts();
+    translateMenu();
 }
 
 // translate site
-
-const contSetting = document.querySelectorAll('.cont-setting p');
 
 function translateMenu() {
     if (langSite == 'ru') {
@@ -436,6 +447,7 @@ function translateMenu() {
         contSetting[4].textContent = 'Показывать время';
         contSetting[5].textContent = 'Показывать дату';
         contSetting[6].textContent = 'Показывать цитаты';
+        contSetting[7].textContent = 'Источник картинок';
     } else if (langSite == 'en') {
         contSetting.forEach((el) => el.style.fontSize = '22px');
         // document.querySelector('.cont-setting').style.fontSize = '22px';
@@ -447,19 +459,26 @@ function translateMenu() {
         contSetting[4].textContent = 'Show time';
         contSetting[5].textContent = 'Show data';
         contSetting[6].textContent = 'Show quotes';
+        contSetting[7].textContent = 'Source pictures';
     }
-}
 
-console.log(contSetting);
+}
 
 function changeLang() {
+    if (cityWeather.value == 'Minsk') cityWeather.value = 'Минск';
+    else if (cityWeather.value == 'Минск') cityWeather.value = 'Minsk';
     getQuotes();
     getWeather(cityWeather.value);
-    // setBg();
     showTime();
-    // document.querySelector('.play-item').classList.add('item-active');
 }
 
-// const city = 'Monte-Carlo';
-// const reg = /^[a-z|а-я| |-]*$/gi;
-// console.log(reg.test(city));
+// self-check
+
+console.log(`
+Не сделаные пункты:
+- Продвинутый аудиоплеер - можно запустить и остановить проигрывания трека кликом по кнопке Play/Pause рядом с ним в плейлисте -3
+- Настройки приложения - если источником получения фото указан API, в настройках приложения можно указать тег/теги, для которых API будет присылает фото -3
+- Дополнительный функционал на выбор -10
+
+Итого: 160 - 10 - 3 - 3 = 144 балла.
+`);
