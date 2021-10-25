@@ -256,7 +256,7 @@ function playAudio() {
         audio.play();
         play.classList.add('pause');
         isPlay = true;
-        console.log(numAudio);
+        // console.log(numAudio);
         // playListT.querySelector(`li[data-src="${audio.src}"`));
         showProgressAudio = setInterval(showProgress, 100);
     } else {
@@ -286,7 +286,7 @@ function showProgress() {
 }
 
 function showProgressTime() {
-    console.log(audio.duration);
+    // console.log(audio.duration);
 
     let curTime = `${String(Math.trunc(audio.currentTime / 60)).padStart(2, '0')}:${String(Math.trunc(audio.currentTime % 60)).padStart(2, '0')}`;
     let durTime = `${String(Math.trunc(audio.duration / 60)).padStart(2, '0')}:${String(Math.trunc(audio.duration % 60)).padStart(2, '0')}`;
